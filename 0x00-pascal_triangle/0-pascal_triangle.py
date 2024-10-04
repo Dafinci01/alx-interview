@@ -19,3 +19,7 @@ def pascal_triangle(n):
                 line.append(triangle[i - 1][j - 1] + triangle[i - 1][j])
         triangle.append(line)
     return triangle
+
+# Example usage:
+if __name__ == "__main__":
+    print(pascal_triangle(5))
