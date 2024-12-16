@@ -1,52 +1,28 @@
+#!/usr/bin/python3
+"""Prime game module.
+"""
+
+
 def isWinner(x, nums):
+    """Determines the winner of a prime game session with `x` rounds.
     """
-    Determines the winner of the game after x rounds.
-    """
-    if not nums or x < 1:
+    if x < 1 or not nums:
         return None
-
-    # Precompute primes up to the maximum number in nums
-    max_num = max(nums)
-    primes = sieve_of_eratosthenes(max_num)
-
-    # Precompute the number of primes removed for each n
-    # `prime_counts[n]` will store the total number of primes used up to n
-    prime_counts = [0] * (max_num + 1)
-    count = 0
-    for i in range(1, max_num + 1):
-        if primes[i]:
-            count += 1
-        prime_counts[i] = count
-
-    maria_wins = 0
-    ben_wins = 0
-
-    # Simulate the game for each round
-    for n in nums:
-        # If prime_counts[n] is odd, Maria wins; otherwise, Ben wins
-        if prime_counts[n] % 2 == 1:
-            maria_wins += 1
-        else:
-            ben_wins += 1
-
-    if maria_wins > ben_wins:
-        return "Maria"
-    elif ben_wins > maria_wins:
-        return "Ben"
-    else:
+    marias_wins, bens_wins = 0, 0
+    # generate primes with a limit of the maximum number in nums
+    n = max(nums)
+    primes = [True for _ in range(1, n + 1, 1)]
+    primes[0] = False
+    for i, is_prime in enumerate(primes, 1):
+        if i == 1 or not is_prime:
+            continue
+        for j in range(i + i, n + 1, i):
+            primes[j - 1] = False
+    # filter the number of primes less than n in nums for each round
+    for _, n in zip(range(x), nums):
+        primes_count = len(list(filter(lambda x: x, primes[0: n])))
+        bens_wins += primes_count % 2 == 0
+        marias_wins += primes_count % 2 == 1
+    if marias_wins == bens_wins:
         return None
-
-def sieve_of_eratosthenes(n):
-    """
-    Generates a list of primes up to n using the Sieve of Eratosthenes.
-    """
-    primes = [True] * (n + 1)
-    primes[0] = primes[1] = False  # 0 and 1 are not primes
-
-    for i in range(2, int(n**0.5) + 1):
-        if primes[i]:
-            for j in range(i * i, n + 1, i):
-                primes[j] = False
-
-    return primes
-
+    turn 'Maria' if marias_wins > bens_wins else 'Ben'
