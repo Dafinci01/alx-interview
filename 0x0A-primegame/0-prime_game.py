@@ -1,25 +1,45 @@
-#!/usr/bin/python3
-"""Island perimeter computing module.
-"""
-
-
-def island_perimeter(grid):
-    """Computes the perimeter of an island with no lakes.
+def isWinner(x, nums):
     """
-    perimeter = 0
-    if type(grid) != list:
-        return 0
-    n = len(grid)
-    for i, row in enumerate(grid):
-        m = len(row)
-        for j, cell in enumerate(row):
-            if cell == 0:
-                continue
-            edges = (
-                i == 0 or (len(grid[i - 1]) > j and grid[i - 1][j] == 0),
-                j == m - 1 or (m > j + 1 and row[j + 1] == 0),
-                i == n - 1 or (len(grid[i + 1]) > j and grid[i + 1][j] == 0),
-                j == 0 or row[j - 1] == 0,
-            )
-            perimeter += sum(edges)
-    return perimeter
+    Determines the winner of a game where players alternate picking numbers from a list.
+
+    Args:
+        x (int): The maximum number of primes a player can pick.
+        nums (list): A list of numbers.
+
+    Returns:
+        str: The name of the winner ("Maria" or "Ben"), or None if there is no winner.
+    """
+    if x == 0 or not nums:
+        return None
+
+    max_n = max(nums)
+    sieve = [True] * (max_n + 1)
+    sieve[0] = sieve[1] = False
+
+    for i in range(2, int(max_n ** 0.5) + 1):
+        if sieve[i]:
+            sieve[i*i : max_n+1 : i] = [False] * len(sieve[i*i : max_n+1 : i])
+
+    prime_count = [0] * (max_n + 1)
+    count = 0
+    for i in range(max_n + 1):
+        if sieve[i]:
+            count += 1
+        prime_count[i] = count
+
+    maria_wins = 0
+    ben_wins = 0
+
+    for n in nums:
+        cnt = prime_count[n]
+        if cnt % 2 == 0:
+            ben_wins += 1
+        else:
+            maria_wins += 1
+
+    if maria_wins > ben_wins:
+        return "Maria"
+    elif ben_wins > maria_wins:
+        return "Ben"
+    else:
+        return None
